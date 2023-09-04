@@ -1,21 +1,9 @@
 require("dotenv").config();
-const { Configuration, OpenAIApi } = require("openai");
-const {
-  getImage,
-  getChat,
-  correctEngish,
-  convertTextToMp3,
-} = require("./Helper/functions");
+
 const { Telegraf } = require("telegraf");
-const { default: axios } = require("axios");
 const logger = require("./Helper/logger");
 const express = require("express");
 const app = express();
-const configuration = new Configuration({
-  apiKey: process.env.API,
-});
-const openai = new OpenAIApi(configuration);
-module.exports = openai;
 
 const bot = new Telegraf(process.env.TG_API);
 
@@ -39,6 +27,7 @@ bot.help((ctx) => {
   );
 });
 
+//bot scrape
 bot.on("message", async (ctx) => {
   const messageText = ctx.message.text.toLowerCase();
 
