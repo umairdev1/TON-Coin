@@ -29,7 +29,6 @@ bot.help((ctx) => {
 });
 //Bot on ask command
 bot.command("ask", async (ctx) => {
-  console.log("ok");
   const text = ctx.message.text?.replace("/ask", "")?.trim().toLowerCase();
 
   logger.info(`Chat: ${ctx.from.username || ctx.from.first_name}: ${text}`);
@@ -40,7 +39,7 @@ bot.command("ask", async (ctx) => {
     if (res) {
       ctx.telegram.sendMessage(
         ctx.message.chat.id,
-        `${res}\n\n\nJoin us on Telegram\nPePe CEO`,
+        `${res}\n\n\nJoin us on Telegram\nDevot`,
         {
           reply_to_message_id: ctx.message.message_id,
         }
@@ -58,7 +57,8 @@ bot.command("ask", async (ctx) => {
 });
 //bot scrape
 bot.on("message", async (ctx) => {
-  const messageText = ctx.message.text.toLowerCase();
+  logger.info(`message: ${ctx.message.text}`);
+  const messageText = ctx.message.text?.toLowerCase();
 
   // List of keywords to filter
   const keywords = [
