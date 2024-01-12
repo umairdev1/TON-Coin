@@ -11,17 +11,6 @@ const bot = new Telegraf(process.env.TG_API);
 bot.start((ctx) => {
   console.log("Group Chat ID:", ctx.chat.id);
 });
-bot.start(async (ctx) => {
-  if (ctx.chat.type === "group") {
-    logger.info(`Bot started In: ${ctx.chat.title} `);
-  } else if (ctx.chat.type === "private") {
-    logger.info(`Bot started By ${ctx.chat.username || ctx.chat.first_name} `);
-  }
-
-  ctx.reply(
-    "Welcome To AI Bot 🧿 \n\nCommands 👾 \n/ask  ask anything from me \n/image to create image from text  \n/en to correct your grammer \n\n\nContract PePe CEO if you want to report any BUG or change in features"
-  );
-});
 
 bot.help((ctx) => {
   ctx.reply(
@@ -112,19 +101,9 @@ const sendMessageWithDelay = async (message, delay, url, coin) => {
     }, delay);
   });
 };
-const interval = 1 * 15 * 1000;
+
 fetchDataAndSendMessage();
-// setInterval(fetchDataAndSendMessage, interval);
 
-app.all("/", (req, res) => {
-  console.log("Just got a request!");
-  bot.telegram.sendMessage(
-    "-1002128903978",
-    `Join us on Telegram\nPePe CEO https://www.geckoterminal.com/_next/image?url=https%3A%2F%2Fassets.geckoterminal.com%2F4dvjymidf47elezccjd0zxvobd1l&w=32&q=75`
-  );
-
-  res.send("Yo!");
-});
 bot
   .launch()
   .then(() => {
@@ -134,9 +113,3 @@ bot
     console.error("Error starting bot:", err);
   });
 app.listen(process.env.PORT || 3000, () => {});
-// if (index === pools.length - 1) {
-//   // Schedule the next call only if this is the last pool
-//   setTimeout(() => {
-//     fetchDataAndSendMessage();
-//   }, 1 * 60 * 1000);
-// }
