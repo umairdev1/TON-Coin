@@ -12,12 +12,6 @@ bot.start((ctx) => {
   console.log("Group Chat ID:", ctx.chat.id);
 });
 
-bot.help((ctx) => {
-  ctx.reply(
-    "\nCommands 👾 \n\n/ask  ask anything from me \n/image to create image from text  \n/en to correct your grammer \n\n\nContract PePe CEO if you want to report any BUG or change in features "
-  );
-});
-
 const fetchDataAndSendMessage = async () => {
   try {
     let shouldFetchData = true;
