@@ -30,33 +30,35 @@ bot.help((ctx) => {
 });
 
 const fetchDataAndSendMessage = async () => {
-  let config = {
-    method: "get",
-    maxBodyLength: Infinity,
-    url: "https://app.geckoterminal.com/api/p1/ton/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&include_network_metrics=true",
-    headers: {
-      authority: "app.geckoterminal.com",
-      accept: "application/json, text/plain, */*",
-      "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
-      "if-none-match": 'W/"fc1e484453b45fa89f986b48bb7e9be3"',
-      origin: "https://www.geckoterminal.com",
-      referer: "https://www.geckoterminal.com/",
-      "sec-ch-ua":
-        '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": '"Windows"',
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-site",
-      "user-agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    },
-  };
+  try {
+    let shouldFetchData = true;
+    while (shouldFetchData) {
+      let config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://app.geckoterminal.com/api/p1/ton/pools?include=dex%2Cdex.network%2Cdex.network.network_metric%2Ctokens&page=1&include_network_metrics=true",
+        headers: {
+          authority: "app.geckoterminal.com",
+          accept: "application/json, text/plain, */*",
+          "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+          "if-none-match": 'W/"fc1e484453b45fa89f986b48bb7e9be3"',
+          origin: "https://www.geckoterminal.com",
+          referer: "https://www.geckoterminal.com/",
+          "sec-ch-ua":
+            '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        },
+      };
 
-  axios
-    .request(config)
-    .then((response) => {
-      const pools = response.data.data; // Take only the first 10 pools
+      const response = await axios.request(config);
+      const pools = response.data.data;
+
       for (let index = 0; index < pools.length; index++) {
         const pool = pools[index];
         const message = `🪙 *${
@@ -71,25 +73,46 @@ const fetchDataAndSendMessage = async () => {
           pool.attributes.price_percent_changes.last_6h
         ).toFixed(2)}%\n👉 *24H:* ${parseFloat(
           pool.attributes.price_percent_changes.last_24h
-        ).toFixed(2)}%
+        ).toFixed(2)}%`;
 
-        `;
-        setTimeout(() => {
-          bot.telegram.sendMessage("-1002128903978", message, {
-            parse_mode: "Markdown",
-          });
-        }, index * 1 * 60 * 1000);
-        // // Send each message individually to the Telegram group
-        // bot.telegram.sendMessage("-1002128903978", message, {
-        //   parse_mode: "Markdown",
-        // });
+        await sendMessageWithDelay(
+          message,
+          30000,
+          pool.attributes.address,
+          pool.attributes.name
+        );
+        if (index === pools.length - 1) {
+          shouldFetchData = true;
+        } else {
+          shouldFetchData = false;
+        }
       }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
-const interval = 1 * 60 * 1000;
+const sendMessageWithDelay = async (message, delay, url, coin) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      bot.telegram.sendMessage("-1002014542391", message, {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: `Buy ${coin.split(" / ")[0]}`,
+                url: `https://www.geckoterminal.com/ton/pools/${url}`,
+              },
+            ],
+          ],
+        },
+      });
+      resolve();
+    }, delay);
+  });
+};
+const interval = 1 * 15 * 1000;
 fetchDataAndSendMessage();
 // setInterval(fetchDataAndSendMessage, interval);
 
@@ -111,3 +134,9 @@ bot
     console.error("Error starting bot:", err);
   });
 app.listen(process.env.PORT || 3000, () => {});
+// if (index === pools.length - 1) {
+//   // Schedule the next call only if this is the last pool
+//   setTimeout(() => {
+//     fetchDataAndSendMessage();
+//   }, 1 * 60 * 1000);
+// }
